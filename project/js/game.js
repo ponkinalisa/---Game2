@@ -25,13 +25,7 @@ class Archer{
     constructor(){
         this.body = document.getElementById('archer');
         this.health = 100;
-        this.movement = setInterval(this.move.bind(this), 1000);
-        this.clearBullets = setInterval(() =>{
-            let bullets = document.getElementsByClassName('bullet');
-            while (bullets.length){
-                bullets[0].remove();
-            }
-        }, 3000)
+        this.movement = setInterval(this.move.bind(this), 3000);
     }
     // Функция для перемещения лучника
     move(){
@@ -41,37 +35,59 @@ class Archer{
 }
 class Bullet{
     constructor(archer){
+        let bullets = document.getElementsByClassName('bullet');
+        while (bullets.length){
+            bullets[0].remove();
+        }
         let bullet = document.createElement('div');
         bullet.classList.add('bullet');
         document.getElementById('arena').appendChild(bullet);
         this.body = document.getElementsByClassName('bullet')[0];
         console.log(parseInt(getComputedStyle(archer.body).top));
         this.body.style.top = `${parseInt(getComputedStyle(archer.body).top) + 20}px`;
-        this.angle = getRandomInt(45, 135);
+        this.angle = getRandomInt(60, 120);
         this.cos = Math.cos(this.angle * (Math.PI / 180));
         this.sin = Math.sin(this.angle * (Math.PI / 180))
-        this.speed = getRandomInt(1, 10);
+        this.speed = getRandomInt(7, 20);
         this.animate_bullet();
     }
     animate_bullet(){
         let frame = 0;
         let right = parseInt(getComputedStyle(this.body).right);
         let top = parseInt(getComputedStyle(this.body).top);
+        let framet = top;
         const bulletInterval = setInterval(() => {
         if (parseInt(getComputedStyle(this.body).right) > parseInt(getComputedStyle(document.getElementById('arena')).width)) { // Убираем пулю через определенное количество кадров
             clearInterval(bulletInterval);
             this.body.remove();
         } else {
             if (!isPaused){
-                this.body.style.right = `${this.sin * (frame * this.speed)}px`;
-                this.body.style.top = `${this.cos * (frame * this.speed)}px`;
+                this.body.style.right = `${Math.floor((frame * this.speed) + right)}px`;
+                /*
+                this.body.style.right = `${Math.floor(this.sin * (frame * this.speed) + right)}px`;
+                
+                if (parseInt(getComputedStyle(this.body).top) > 350 || parseInt(getComputedStyle(this.body).top) < 0){
+                    if (this.cos < 0){
+                        this.cos = Math.abs(this.cos);
+                    }else{
+                        this.cos = 1 + this.cos;
+                    }
+                    if (framet < 10){
+                        framet = 0;
+                    }else{
+                        framet = 400;
+                    }
+
+                } 
+                this.body.style.top = `${Math.floor(this.cos * (framet) + framet)}px`;*/
                 this.checkCollision();
                 frame++;
+                framet += this.speed;
             }
         }}, 17); // Частота обновления ~60 FPS
     }
     checkCollision(){
-        console.log(0);
+        console.log(this.body.style.top);
     }
 }
 
