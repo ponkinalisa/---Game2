@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Гладиатор: Сражение с лучником</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div id="game-screen" class="screen">
+        <div id="header">
+            <p id="player-name-display">Имя игрока: <span id="player-name-text"></span></p>
+            <p>Время: <span id="timer">00:00</span></p>
+            <p>Здоровье: <span id="health">100%</span></p>
+        </div>
+        
+        <div id="arena">
+            <div id="gladiator"></div>
+            <div id="archer"></div>
+        </div>
+
+        <div id="pause-overlay" class="overlay">
+            <p>Игра приостановлена. Нажмите ESC для продолжения.</p>
+        </div>
+
+        <div id="result-screen" class="overlay">
+            <h2>Игра завершена!</h2>
+            <p id="final-time">Время игры: 00:00</p>
+            <p id="final-health">Здоровье: 100%</p>
+            <button id="restart-btn">Рестарт</button>
+        </div>
+    </div>
+
+    <script src="../js/game.js"></script>
+</body>
+</html>

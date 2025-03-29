@@ -1,0 +1,24 @@
+/* Минимальный стиль для игры */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    text-align: center;
+}
+
+#welcome-screen {
+    margin-top: 100px;
+}
+
+#start-game {
+    padding: 10px 20px;
+    margin-top: 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#start-game:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
