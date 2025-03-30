@@ -4,20 +4,36 @@ class Gladiator{
         this.body = document.getElementById('gladiator');
         this.health = 100;
         this.boost = false;
-        this.speed = 7;
+        this.speed = 30;
+        this.health_inter = setInterval(()=>{healthDisplay.innerHTML = `${this.health}%`}, 17);
+        this.attack = false;
     }
     // Функция для перемещения гладиатора
     move(e){
         let key = e.key.toLowerCase();
         if (isPaused) return
+        if (this.health<= 0) return
         if (key === 'w' || key === 'arrowup' || key === 'ц') {
             let gladiatorTop = parseInt(getComputedStyle(this.body).top);
-            if (gladiatorTop > 0) this.body.style.top = gladiatorTop - this.speed + 'px';
+            if (gladiatorTop > 0) {
+                this.body.style.top = gladiatorTop - this.speed + 'px';
+            }
         }
         if (key === 's' || key === 'arrowdown' || key === 'ы') {
             let gladiatorTop = parseInt(getComputedStyle(this.body).top);
-            if (gladiatorTop < 350) this.body.style.top = gladiatorTop + this.speed + 'px';
+            if (gladiatorTop < 350) {
+                this.body.style.top = gladiatorTop + this.speed + 'px';
+            }
         }
+        if (key === 'e'){
+            if (this.attack == false){
+                this.attack = true;
+            }
+        }
+    }
+    end(){
+        document.getElementById('final-res').innerHTML = 'Вы проиграли!';
+        endGame();
     }
 }
 // класс гладиатора
@@ -30,25 +46,37 @@ class Archer{
     // Функция для перемещения лучника
     move(){
         this.body.style.top = `${getRandomInt(10, 340)}px`;
-        this.bullet = new Bullet(this);
+        this.bullet = new Bullet(this, gladiator, 1);
+    }
+    end(){
+        clearInterval(this.movement);
+        endGame();
+        document.getElementById('final-res').innerHTML = 'Вы выиграли!';
     }
 }
 class Bullet{
-    constructor(archer){
+    constructor(self, enemy, direction){
+        this.self = self;
+        this.enemy = enemy;
+        this.direction = direction;
+
         let bullets = document.getElementsByClassName('bullet');
-        while (bullets.length){
+        while (bullets.length > 3){
             bullets[0].remove();
         }
-        let bullet = document.createElement('div');
-        bullet.classList.add('bullet');
-        document.getElementById('arena').appendChild(bullet);
-        this.body = document.getElementsByClassName('bullet')[0];
-        console.log(parseInt(getComputedStyle(archer.body).top));
-        this.body.style.top = `${parseInt(getComputedStyle(archer.body).top) + 20}px`;
+        this.body = document.createElement('div');
+        this.body.classList.add('bullet');
+        if (this.direction < 0){
+            this.body.style.left= `${parseInt(getComputedStyle(self.body).left) + 40}px`;
+        }
+        this.body.style.top = `${parseInt(getComputedStyle(self.body).top) + 20}px`;
         this.angle = getRandomInt(60, 120);
         this.cos = Math.cos(this.angle * (Math.PI / 180));
         this.sin = Math.sin(this.angle * (Math.PI / 180))
-        this.speed = getRandomInt(7, 20);
+        this.speed = getRandomInt(5, 15);
+        this.collision = false;
+        this.damage = 20;
+        document.getElementById('arena').appendChild(this.body);
         this.animate_bullet();
     }
     animate_bullet(){
@@ -56,13 +84,17 @@ class Bullet{
         let right = parseInt(getComputedStyle(this.body).right);
         let top = parseInt(getComputedStyle(this.body).top);
         let framet = top;
-        const bulletInterval = setInterval(() => {
+        this.bulletInterval = setInterval(() => {
         if (parseInt(getComputedStyle(this.body).right) > parseInt(getComputedStyle(document.getElementById('arena')).width)) { // Убираем пулю через определенное количество кадров
-            clearInterval(bulletInterval);
             this.body.remove();
+            clearInterval(this.bulletInterval);
         } else {
             if (!isPaused){
-                this.body.style.right = `${Math.floor((frame * this.speed) + right)}px`;
+                if (this.direction > 0){
+                    this.body.style.right = `${Math.floor((frame * this.speed) + right)}px`;
+                }else{
+                    this.body.style.left = `${Math.floor((frame * this.speed) + parseInt(getComputedStyle(this.body).left))}px`;
+                }
                 /*
                 this.body.style.right = `${Math.floor(this.sin * (frame * this.speed) + right)}px`;
                 
@@ -87,7 +119,42 @@ class Bullet{
         }}, 17); // Частота обновления ~60 FPS
     }
     checkCollision(){
-        console.log(this.body.style.top);
+        const personRect = this.enemy.body.getBoundingClientRect();
+        const bulletRect = this.body.getBoundingClientRect();
+    if (personRect.left <= bulletRect.right &&
+        personRect.right >= bulletRect.left &&
+        personRect.top <= bulletRect.bottom &&
+        personRect.bottom >= bulletRect.top) { 
+            if (this.collision == false){
+                this.collision = true;
+                /*let img1 = document.getElementsByClassName("boom")[0];
+                img1.style.display = 'block';
+                img1.style.top = `${personRect.top - 20}px`;
+                let frame = 0;
+                const imgInterval = setInterval(() => {
+                    if (frame === 100) {
+                        clearInterval(imgInterval);
+                        img1.style.display = 'none';
+                    } else {
+                        img.style.transform = `scale(${frame * 0.01 + 0.5})`;
+                        img.style.opacity = `${1 - frame * 0.01}`;
+                        frame++;
+                    }
+                    }, 17); // Частота обновления ~60 FPS*/
+                if (this.enemy.health >= this.damage){
+                    this.enemy.health -= this.damage;
+                }
+
+                if (this.enemy.health <= 0){
+                    clearInterval(this.bulletInterval);
+                    this.self.end();
+                    this.enemy.end();
+                }
+            }
+
+            //анимация столкновениe
+            
+    }
     }
 }
 
@@ -111,11 +178,20 @@ const playerNameInput = document.getElementById('player-name');
 const playerNameDisplay = document.getElementById('player-name-text');
 const timerDisplay = document.getElementById('timer');
 const healthDisplay = document.getElementById('health');
-const gladiator = new Gladiator();
-const archer = new Archer();
 const pauseOverlay = document.getElementById('pause-overlay');
 const resultScreen = document.getElementById('result-screen');
 const restartButton = document.getElementById('restart-btn');
+
+var gladiator = new Gladiator();
+var archer = new Archer();
+
+const cycle_gladiator_attack = setInterval(() => {
+    if (gladiator.attack == true){
+        gladiator.attack = false;
+        gladiator.bullet = new Bullet(gladiator, archer, -1);
+        gladiator.bullet.speed = 2;
+    }
+}, 17);
 
 // Функция запуска игры
 function startGame() {
@@ -152,17 +228,12 @@ function endGame() {
     clearInterval(gameInterval);
     resultScreen.style.display = 'block';
     document.getElementById('final-time').innerText = `Время игры: ${timerDisplay.innerText}`;
-    document.getElementById('final-health').innerText = `Здоровье: ${playerHealth}%`;
+    document.getElementById('final-health').innerText = `Здоровье: ${gladiator.health}%`;
 }
 
 // Функция рестарта игры
 function restartGame() {
-    playerHealth = 100;
-    timeElapsed = 0;
-    timerDisplay.innerText = '00:00';
-    healthDisplay.innerText = `${playerHealth}%`;
-    resultScreen.style.display = 'none';
-    startGame();
+    location.reload();
 }
 
 // Прослушка событий
@@ -172,9 +243,8 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         togglePause();
     }
+    gladiator.move(e);
 });
 
-// Функция для перемещения гладиатора
-document.addEventListener('keydown', (e) => {gladiator.move(e)});
 
 startGame();

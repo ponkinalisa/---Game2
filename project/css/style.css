@@ -65,6 +65,7 @@ button:disabled {
     bottom: 20px;
     left: 20px;
     border-radius: 10px;
+    transition: top 0.1s ease;
 }
 
 #archer {
