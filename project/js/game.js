@@ -61,7 +61,7 @@ class Bullet{
         this.direction = direction;
 
         let bullets = document.getElementsByClassName('bullet');
-        while (bullets.length > 3){
+        while (bullets.length > 4){
             bullets[0].remove();
         }
         this.body = document.createElement('div');
@@ -151,11 +151,55 @@ class Bullet{
                     this.enemy.end();
                 }
             }
-
-            //анимация столкновениe
             
     }
     }
+}
+class Gift{
+    constructor(){
+        let gifts = document.getElementsByClassName('gift');
+        while (gifts.length > 0){
+            gifts[0].remove();
+        }
+        this.body = document.createElement('div');
+        this.body.classList.add('gift');
+        this.body.style.top = `${getRandomInt(10, 340)}px`;
+        document.getElementById('arena').appendChild(this.body);
+        this.collision = false;
+        this.cycle = setInterval(() => {
+            this.checkCollision();
+        }, 17)
+    }
+    checkCollision(){
+        const personRect = gladiator.body.getBoundingClientRect();
+        const bulletRect = this.body.getBoundingClientRect();
+    if (personRect.left <= bulletRect.right &&
+        personRect.right >= bulletRect.left &&
+        personRect.top <= bulletRect.bottom &&
+        personRect.bottom >= bulletRect.top) { 
+            if (this.collision == false){
+                this.collision = true;
+                /*let img1 = document.getElementsByClassName("boom")[0];
+                img1.style.display = 'block';
+                img1.style.top = `${personRect.top - 20}px`;
+                let frame = 0;
+                const imgInterval = setInterval(() => {
+                    if (frame === 100) {
+                        clearInterval(imgInterval);
+                        img1.style.display = 'none';
+                    } else {
+                        img.style.transform = `scale(${frame * 0.01 + 0.5})`;
+                        img.style.opacity = `${1 - frame * 0.01}`;
+                        frame++;
+                    }
+                    }, 17); // Частота обновления ~60 FPS*/
+                this.body.remove();
+                if (gladiator.health + 20 <=  100){
+                    gladiator.health += 20;
+                }
+            }
+        }
+    } 
 }
 
 function getRandomInt(min, max) {
@@ -192,6 +236,11 @@ const cycle_gladiator_attack = setInterval(() => {
         gladiator.bullet.speed = 2;
     }
 }, 17);
+
+const gifts = setInterval(() => {
+    var gift = new Gift();
+}, 7000);
+
 
 // Функция запуска игры
 function startGame() {
@@ -245,6 +294,11 @@ document.addEventListener('keydown', (e) => {
     }
     gladiator.move(e);
 });
+document.getElementById('arena').addEventListener('click', (e) => {
+    if (e.clientY - 120 > 0 && e.clientY - 120 < 340){
+    gladiator.body.style.top = e.clientY - 120 + 'px';}
+});
+
 
 
 startGame();
