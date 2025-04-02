@@ -45,8 +45,11 @@ class Archer{
     }
     // Функция для перемещения лучника
     move(){
-        this.body.style.top = `${getRandomInt(10, 340)}px`;
-        this.bullet = new Bullet(this, gladiator, 1);
+        if (!isPaused){
+            this.body.style.top = `${getRandomInt(10, 340)}px`;
+            this.bullet = new Bullet(this, gladiator, 1);
+
+        }
     }
     end(){
         clearInterval(this.movement);
@@ -238,7 +241,9 @@ const cycle_gladiator_attack = setInterval(() => {
 }, 17);
 
 const gifts = setInterval(() => {
-    var gift = new Gift();
+    if (!isPaused){
+        var gift = new Gift();
+    }
 }, 7000);
 
 
@@ -295,8 +300,9 @@ document.addEventListener('keydown', (e) => {
     gladiator.move(e);
 });
 document.getElementById('arena').addEventListener('click', (e) => {
-    if (e.clientY - 120 > 0 && e.clientY - 120 < 340){
-    gladiator.body.style.top = e.clientY - 120 + 'px';}
+    if (e.clientY - 120 > 0 && e.clientY - 120 < 340 && !isPaused){
+    gladiator.body.style.top = e.clientY - 120 + 'px';
+}
 });
 
 
